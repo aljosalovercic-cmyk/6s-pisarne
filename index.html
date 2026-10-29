@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6S Pregled - Pisarne</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+
+        <h1>6S Pregled Pisarn</h1>
+<div id="napredek"></div>
+<div id="neskladja">Neskladja: 0</div>
+<div id="progressBar">
+    <div id="progressFill"></div>
+</div>
+<div id="kategorija"></div>
+        <div id="vprasanje">
+            Vprašanje se bo prikazalo tukaj.
+        </div>
+
+      <div id="komentarPolje" style="display:none;">
+
+    <textarea
+        id="komentar"
+        placeholder="Vnesi komentar za neskladje..."
+    ></textarea>
+
+    <br><br>
+
+    <input
+    type="file"
+    id="slika"
+    accept="image/*"
+    capture="environment"
+>
+
+</div>
+
+
+<div class="gumbi">
+    <button onclick="nazaj()">NAZAJ</button>
+    <button onclick="da()">DA</button>
+    <button onclick="pokaziKomentar()">
+    NE
+</button>
+<button onclick="ne()" id="potrdiNe" style="display:none;">
+    Potrdi NE
+</button>
+</div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
