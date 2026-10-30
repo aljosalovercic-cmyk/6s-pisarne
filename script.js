@@ -1,5 +1,7 @@
 let stNeskladij = 0;
 let odgovori = [];
+let imePresojevalca = "";
+let lokacijaPregleda = "";
 const vprasanja = [
 
 /* 04. SPLOŠNA UREJENOST */
@@ -89,7 +91,23 @@ const vprasanja = [
 ];
 let trenutno = 0;
 
-prikazi();
+function zacetekPregleda(event) {
+    event.preventDefault();
+
+    imePresojevalca =
+        document.getElementById("imePresojevalca").value.trim();
+    lokacijaPregleda =
+        document.getElementById("lokacijaPregleda").value.trim();
+
+    if (!imePresojevalca || !lokacijaPregleda) {
+        alert("Vnesi ime presojevalca in lokacijo presoje.");
+        return;
+    }
+
+    document.getElementById("zacetniPodatki").style.display = "none";
+    document.getElementById("aplikacija").style.display = "block";
+    prikazi();
+}
 
 function prikazi() {
 
@@ -118,13 +136,16 @@ function prikazi() {
     "none";
 
 document.getElementById("komentar").value = "";
+document.getElementById("slika").value = "";
 document.getElementById("potrdiNe").style.display =
-    "none";
+"none";
 }
 
 function da() {
 
     odgovori.push({
+        id: vprasanja[trenutno].id,
+        kategorija: vprasanja[trenutno].kategorija,
         vprasanje: vprasanja[trenutno].vprasanje,
         odgovor: "DA",
         komentar: document.getElementById("komentar").value
@@ -142,7 +163,6 @@ function da() {
 }
 
 function ne() {
-stNeskladij++;
 const komentar =
     document.getElementById("komentar").value;
 
@@ -150,13 +170,22 @@ if (komentar.trim() === "") {
     alert("Pri neskladju vnesi komentar.");
     return;
 }
+const slika =
+    document.getElementById("slika").files[0];
+
+odgovori.push({
+    id: vprasanja[trenutno].id,
+    kategorija: vprasanja[trenutno].kategorija,
+    vprasanje: vprasanja[trenutno].vprasanje,
+    odgovor: "NE",
+    komentar: komentar,
+    slikaIme: slika ? slika.name : ""
+});
+
+stNeskladij =
+    odgovori.filter(o => o.odgovor === "NE").length;
 document.getElementById("neskladja").innerHTML =
     "Neskladja: " + stNeskladij;
-    odgovori.push({
-        vprasanje: vprasanja[trenutno].vprasanje,
-        odgovor: "NE",
-        komentar: document.getElementById("komentar").value
-    });
 
     document.getElementById("komentar").value = "";
 
@@ -172,7 +201,11 @@ document.getElementById("neskladja").innerHTML =
 
 function konec() {
 
-    let html = "<h1>Pregled zaključen</h1>";
+    let html = `
+        <h1>Pregled zaključen</h1>
+        <p><b>Presojevalec:</b> ${pobegniHtml(imePresojevalca)}</p>
+        <p><b>Lokacija presoje:</b> ${pobegniHtml(lokacijaPregleda)}</p>
+    `;
 
     odgovori.forEach(o => {
 
@@ -198,6 +231,17 @@ Shrani rezultate
 document.body.innerHTML = html;
     
 }
+
+function pobegniHtml(vrednost) {
+    return vrednost.replace(/[&<>"']/g, znak => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[znak]);
+}
+
 function nazaj() {
 
     if (trenutno > 0) {
@@ -205,6 +249,10 @@ function nazaj() {
         trenutno--;
 
         odgovori.pop();
+        stNeskladij =
+            odgovori.filter(o => o.odgovor === "NE").length;
+        document.getElementById("neskladja").innerHTML =
+            "Neskladja: " + stNeskladij;
 
         prikazi();
     }
@@ -212,12 +260,43 @@ function nazaj() {
 }
 function shraniRezultate() {
 
-    const podatki =
-        JSON.stringify(odgovori, null, 2);
+    const napake =
+        odgovori.filter(o => o.odgovor === "NE");
+
+    const vrstice = [
+        "6S PREGLED PISARN",
+        "Datum pregleda: " + new Date().toLocaleString("sl-SI"),
+        "Presojevalec: " + imePresojevalca,
+        "Lokacija presoje: " + lokacijaPregleda,
+        "Število pregledanih vprašanj: " + odgovori.length,
+        "Število neskladij: " + napake.length,
+        "",
+        "VSI ODGOVORI"
+    ];
+
+    odgovori.forEach((o, index) => {
+        vrstice.push(
+            "",
+            (index + 1) + ". [" + o.id + "] " + o.kategorija,
+            "Vprašanje: " + o.vprasanje,
+            "Odgovor: " + o.odgovor
+        );
+
+        if (o.odgovor === "NE") {
+            vrstice.push(
+                "Napaka / komentar: " + o.komentar,
+                "Slika: " + (o.slikaIme || "Ni priložena")
+            );
+        } else if (o.komentar) {
+            vrstice.push("Komentar: " + o.komentar);
+        }
+    });
+
+    const podatki = "\uFEFF" + vrstice.join("\r\n");
 
     const blob = new Blob(
         [podatki],
-        { type: "application/json" }
+        { type: "text/plain;charset=utf-8" }
     );
 
     const a =
@@ -227,7 +306,7 @@ function shraniRezultate() {
         URL.createObjectURL(blob);
 
     a.download =
-        "6S_Pregled.json";
+        "6S_Pregled.txt";
 
     a.click();
 }

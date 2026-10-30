@@ -11,6 +11,22 @@
     <div class="container">
 
         <h1>6S Pregled Pisarn</h1>
+        <form id="zacetniPodatki" class="zacetni-podatki" onsubmit="zacetekPregleda(event)">
+            <label for="imePresojevalca">Ime presojevalca</label>
+            <input type="text" id="imePresojevalca" required>
+
+            <label for="lokacijaPregleda">Kje se izvaja presoja?</label>
+            <input
+                type="text"
+                id="lokacijaPregleda"
+                placeholder="npr. Pisarna vodje TED - Vlek"
+                required
+            >
+
+            <button type="submit">Začni pregled</button>
+        </form>
+
+        <div id="aplikacija" style="display:none;">
 <div id="napredek"></div>
 <div id="neskladja">Neskladja: 0</div>
 <div id="progressBar">
@@ -50,6 +66,8 @@
     Potrdi NE
 </button>
 </div>
+
+        </div>
 
     </div>
 

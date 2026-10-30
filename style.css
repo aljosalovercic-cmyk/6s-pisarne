@@ -30,6 +30,25 @@ textarea{
     box-sizing:border-box;
 }
 
+.zacetni-podatki label{
+    display:block;
+    margin:16px 0 6px;
+    font-weight:bold;
+}
+
+.zacetni-podatki input[type="text"]{
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+}
+
+.zacetni-podatki button{
+    width:100%;
+    margin-top:20px;
+    background:#007bff;
+    color:white;
+}
+
 .gumbi{
     margin-top:20px;
 }
